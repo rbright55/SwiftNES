@@ -9,13 +9,13 @@
 import Foundation
 
 final class Mapper7: Mapper {
-	private var prgBankOffset: UInt16
+	private var prgBankOffset: Int
 	
 	override init() {
 		prgBankOffset = 0
 	}
 	
-	override func read(_ address: UInt16) -> UInt8 {
+	override func read(_ address: Int) -> UInt8 {
 		switch address {
 			case 0x0000 ..< 0x2000:
 				return ppuMemory.banks[address]
@@ -30,7 +30,7 @@ final class Mapper7: Mapper {
 		return 0
 	}
 	
-	override func write(_ address: UInt16, data: UInt8) {
+	override func write(_ address: Int, data: UInt8) {
 		switch address {
 			case 0x0000 ..< 0x2000:
 				ppuMemory.banks[address] = data
@@ -44,7 +44,7 @@ final class Mapper7: Mapper {
 	}
 	
 	func bankSelect(_ data: UInt8) {
-		prgBankOffset = (UInt16(data) & 0x7) * 0x8000
+		prgBankOffset = (Int(data) & 0x7) * 0x8000
 		
 		ppuMemory.oneScreenUpper = data & 0x10 == 0x10
 	}

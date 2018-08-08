@@ -9,7 +9,7 @@
 import Foundation
 
 extension Array {
-    subscript(i: UInt16) -> Element {
+    subscript(i: Int) -> Element {
         get {
             return self[Int(i)]
         } set(from) {

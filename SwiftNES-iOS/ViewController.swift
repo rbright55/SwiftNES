@@ -41,7 +41,7 @@ class ViewController: UIViewController, MTKViewDelegate {
 	private var pipeline: MTLComputePipelineState! = nil
 	
 	private var texture: MTLTexture! = nil
-	private var textureOptions = [MTKTextureLoaderOptionTextureUsage: Int(MTLTextureUsage.renderTarget.rawValue) as NSNumber]
+	private var textureOptions = [MTKTextureLoader.Option.textureUsage: Int(MTLTextureUsage.renderTarget.rawValue) as NSNumber]
 	private var textureDescriptor: MTLTextureDescriptor? = nil
 	
 	private let threadGroupCount = MTLSizeMake(8, 8, 1)
@@ -117,9 +117,9 @@ class ViewController: UIViewController, MTKViewDelegate {
 		
 		metalView.drawableSize = metalView.frame.size
 		
-		self.commandQueue = device.newCommandQueue()
+        self.commandQueue = device?.makeCommandQueue()
 		
-		self.textureLoader = MTKTextureLoader(device: device)
+        self.textureLoader = MTKTextureLoader(device: device!)
 		
 //		self.threadGroups = MTLSizeMake((width+threadGroupCount.width)/threadGroupCount.width, (height+threadGroupCount.height)/threadGroupCount.height, 1)
 //		
@@ -170,9 +170,9 @@ class ViewController: UIViewController, MTKViewDelegate {
 		apu.cpu = cpu
 		ppu.cpu = cpu
 		
-		cpu.reset()
+        cpu?.reset()
 		
-		initializeAudio()
+        initializeAudio(with: apu)
 
 		guard let queue = queue else {
 			return false
@@ -230,13 +230,13 @@ class ViewController: UIViewController, MTKViewDelegate {
 		let bytesPerRow = width * bytesPerPixel
 		
 //		let drawable = self.metalView.currentDrawable!.texture
-		metalView.currentDrawable!.texture.replace(MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0, withBytes: UnsafeRawPointer(screen), bytesPerRow: bytesPerRow)
+        metalView.currentDrawable!.texture.replace(region: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0, withBytes: UnsafeRawPointer(screen), bytesPerRow: bytesPerRow)
 		
-		let commandBuffer = commandQueue.commandBuffer()
+        let commandBuffer = commandQueue.makeCommandBuffer()
 		
-		commandBuffer.present(metalView.currentDrawable!)
+        commandBuffer?.present(metalView.currentDrawable!)
 		
-		commandBuffer.commit()
+        commandBuffer?.commit()
 	}
 
 	func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {

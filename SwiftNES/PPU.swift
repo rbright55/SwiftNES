@@ -21,7 +21,7 @@ struct Tile {
 	var attributeTable: UInt8
 	var patternTableLow: UInt8
 	var patternTableHigh: UInt8
-	var vramAddress: UInt16
+	var vramAddress: Int
 }
 
 private let colors: [UInt32] = [0x7C7C7C, 0x0000FC, 0x0000BC, 0x4428BC, 0x940084, 0xA80020, 0xA81000,
@@ -49,7 +49,7 @@ final class PPU: NSObject {
 			generateNMI = (PPUCTRL & 0x80) == 0x80
 			
 			// Update tempVramAddress
-			tempVramAddress = (tempVramAddress & 0xF3FF) | ((UInt16(PPUCTRL) & 0x03) << 10)
+			tempVramAddress = (tempVramAddress & 0xF3FF) | ((Int(PPUCTRL) & 0x03) << 10)
 			
 			nmiChange()
 		}
@@ -112,10 +112,10 @@ final class PPU: NSObject {
 		didSet {
 			if writeToggle {
 				// Second write
-				tempVramAddress = (tempVramAddress & 0x8FFF) | ((UInt16(PPUSCROLL) & 0x7) << 12)
-				tempVramAddress = (tempVramAddress & 0xFC1F) | ((UInt16(PPUSCROLL) & 0xF8) << 2)
+				tempVramAddress = (tempVramAddress & 0x8FFF) | ((Int(PPUSCROLL) & 0x7) << 12)
+				tempVramAddress = (tempVramAddress & 0xFC1F) | ((Int(PPUSCROLL) & 0xF8) << 2)
 			} else {
-				tempVramAddress = (tempVramAddress & 0xFFE0) | (UInt16(PPUSCROLL) >> 3)
+				tempVramAddress = (tempVramAddress & 0xFFE0) | (Int(PPUSCROLL) >> 3)
 				fineXScroll = PPUSCROLL & 0x7
 			}
 			
@@ -130,7 +130,7 @@ final class PPU: NSObject {
 		didSet {
 			if writeToggle {
 				// Second write
-				tempVramAddress = (tempVramAddress & 0xFF00) | UInt16(PPUADDR)
+				tempVramAddress = (tempVramAddress & 0xFF00) | Int(PPUADDR)
 				currentVramAddress = tempVramAddress
 				
 				a12(tempVramAddress, old: currentPPUADDRAddress)
@@ -138,7 +138,7 @@ final class PPU: NSObject {
 				// TODO: Fix hack
 				currentPPUADDRAddress = tempVramAddress
 			} else {
-				tempVramAddress = (tempVramAddress & 0x80FF) | ((UInt16(PPUADDR) & 0x3F) << 8)
+				tempVramAddress = (tempVramAddress & 0x80FF) | ((Int(PPUADDR) & 0x3F) << 8)
 			}
 			
 			writeToggle = !writeToggle
@@ -273,12 +273,12 @@ final class PPU: NSObject {
 	private var lastWrittenRegisterDecayed = true
 	private var lastWrittenRegisterSetCycle: Int
 	
-	private var currentVramAddress: UInt16
-	private var tempVramAddress: UInt16
+	private var currentVramAddress: Int
+	private var tempVramAddress: Int
 	private var fineXScroll: UInt8
 	private var writeToggle: Bool
 	
-	private var currentPPUADDRAddress: UInt16
+	private var currentPPUADDRAddress: Int
 	
 	
 	// MARK: Stored Values Between Cycles -
@@ -294,8 +294,8 @@ final class PPU: NSObject {
 	private var spriteTileNumber: UInt8
 	private var spriteAttributes: UInt8
 	private var spriteXCoord: UInt8
-	private var spriteBaseAddress: UInt16
-	private var spriteYShift: UInt16
+	private var spriteBaseAddress: Int
+	private var spriteYShift: Int
 	
 	private var oamByte: UInt8
 	
@@ -587,7 +587,7 @@ final class PPU: NSObject {
 					spriteAttributes = secondaryOAM[secondaryOAMIndex + 2]
 					spriteXCoord = secondaryOAM[secondaryOAMIndex + 3]
 					
-					spriteYShift = UInt16(scanline) - UInt16(spriteYCoord)
+					spriteYShift = Int(scanline) - Int(spriteYCoord)
 					
 					if spriteYCoord == 0xFF {
 						spriteYShift = 0
@@ -633,9 +633,9 @@ final class PPU: NSObject {
 				} else if phaseIndex == 4 {
 					fetchNameTable()
 				} else if phaseIndex == 6 {
-					patternTableLow = ppuMemory.readMemory(spriteBaseAddress + (UInt16(spriteTileNumber) << 4) + spriteYShift)
+					patternTableLow = ppuMemory.readMemory(spriteBaseAddress + (Int(spriteTileNumber) << 4) + spriteYShift)
 				} else if phaseIndex == 0 {
-					patternTableHigh = ppuMemory.readMemory(spriteBaseAddress + (UInt16(spriteTileNumber) << 4) + spriteYShift + 8)
+					patternTableHigh = ppuMemory.readMemory(spriteBaseAddress + (Int(spriteTileNumber) << 4) + spriteYShift + 8)
 					
 					if getBit(6, pointer: &spriteAttributes) {
 						patternTableLow = reverseByte(patternTableLow)
@@ -696,7 +696,7 @@ final class PPU: NSObject {
 			
 			let patternValue = (attributeBits << 2) | (highBit << 1) | lowBit
 			
-			let paletteIndex = Int(ppuMemory.readPaletteMemory(0x10 + UInt16(patternValue))) & 0x3F
+			let paletteIndex = Int(ppuMemory.readPaletteMemory(0x10 + Int(patternValue))) & 0x3F
 			
 			// First color each section of sprite palette is transparent
 			if patternValue & 0x3 == 0 {
@@ -766,7 +766,7 @@ final class PPU: NSObject {
 			patternValue = 0
 		}
 		
-		let paletteIndex = Int(ppuMemory.readPaletteMemory(UInt16(patternValue))) & 0x3F
+		let paletteIndex = Int(ppuMemory.readPaletteMemory(Int(patternValue))) & 0x3F
 		
 		let color = colors[paletteIndex]
 		
@@ -795,7 +795,7 @@ final class PPU: NSObject {
 	
 	func fetchLowPatternTable() {
 		// Fetch lower Pattern Table byte
-		var basePatternTableAddress: UInt16 = 0x0
+		var basePatternTableAddress: Int = 0x0
 		
 		if backgroundPatternTableAddress {
 			basePatternTableAddress = 0x1000
@@ -803,12 +803,12 @@ final class PPU: NSObject {
 		
 		let fineY = (currentVramAddress >> 12) & 7
 		
-		patternTableLow = ppuMemory.readMemory(basePatternTableAddress + (UInt16(nameTable) << 4) + fineY)
+		patternTableLow = ppuMemory.readMemory(basePatternTableAddress + (Int(nameTable) << 4) + fineY)
 	}
 	
 	func fetchHighPatternTable() {
 		// Fetch upper Pattern Table byte
-		var basePatternTableAddress: UInt16 = 0x8
+		var basePatternTableAddress: Int = 0x8
 		
 		if backgroundPatternTableAddress {
 			basePatternTableAddress = 0x1008
@@ -816,7 +816,7 @@ final class PPU: NSObject {
 		
 		let fineY = (currentVramAddress >> 12) & 7
 		
-		patternTableHigh = ppuMemory.readMemory(basePatternTableAddress + (UInt16(nameTable) << 4) + fineY)
+		patternTableHigh = ppuMemory.readMemory(basePatternTableAddress + (Int(nameTable) << 4) + fineY)
 	}
 	
 	func fetchSprite() {
@@ -884,7 +884,7 @@ final class PPU: NSObject {
 		// If fine Y < 7
 		if (currentVramAddress & 0x7000) != 0x7000 {
 			// Increment fine Y
-			currentVramAddress = UInt16((Int(currentVramAddress) + 0x1000) & 0xFFFF)
+			currentVramAddress = Int((Int(currentVramAddress) + 0x1000) & 0xFFFF)
 		} else {
 			// Fine Y = 0
 			currentVramAddress &= 0x8FFF
@@ -931,7 +931,7 @@ final class PPU: NSObject {
 		currentVramAddress = (currentVramAddress & 0xFBE0) | (tempVramAddress & 0x041F)
 	}
 	
-	func writeDMA(_ address: UInt16, data: UInt8) {
+	func writeDMA(_ address: Int, data: UInt8) {
 		oamMemory[address] = data
 	}
 	
@@ -1077,7 +1077,7 @@ final class PPU: NSObject {
 		return renderBackground || renderSprites
 	}
 	
-	private func a12(_ new: UInt16, old: UInt16) {
+	private func a12(_ new: Int, old: Int) {
 		if new & 0x1000 == 0x1000 && old & 0x1000 == 0 {
 			if ppuMemory.a12Timer == 0 {
 				ppuMemory.mapper.step()

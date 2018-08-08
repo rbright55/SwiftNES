@@ -29,18 +29,18 @@ final class Logger: NSObject {
 		fileHandle?.write((string + "\n").data(using: String.Encoding.utf8)!)
 	}
 	
-	func hexString<T : UnsignedInteger>(_ value: T, padding: Int) -> String {
-		var string = String(value, radix: 16)
-		
-		for _ in string.characters.count..<padding {
+	func hexString(_ value: UInt8, padding: Int) -> String {
+        var string = String(format:"%02X", value)
+
+		for _ in string.count..<padding {
 			string = "0" + string
 		}
 		
 		return string
 	}
 	
-	func logFormattedInstuction(_ address: UInt16, opcode: UInt8, A: UInt8, X: UInt8, Y: UInt8, P: UInt8, SP: UInt8, CYC: Int, SL: Int) {
-		log(String(format: "%@  %@A:%@ X:%@ Y:%@ P:%@ SP:%@ CYC:%@ SL:%@", hexString(address, padding: 4),
+	func logFormattedInstuction(_ address: Int, opcode: UInt8, A: UInt8, X: UInt8, Y: UInt8, P: UInt8, SP: UInt8, CYC: Int, SL: Int) {
+        self.log(String(format: "%@  %@A:%@ X:%@ Y:%@ P:%@ SP:%@ CYC:%@ SL:%@", hexString(UInt8(address), padding: 4),
 			hexString(opcode, padding: 2).padding(toLength: 42, withPad: " ", startingAt: 0),
 			hexString(A, padding: 2), hexString(X, padding: 2), hexString(Y, padding: 2), hexString(P, padding: 2),
 			hexString(SP, padding: 2), String(CYC).padding(toLength: 3, withPad: " ", startingAt: 0), String(SL)).uppercased())
@@ -55,7 +55,7 @@ final class Logger: NSObject {
 			var string = ""
 			
 			if i % 8 == 0 {
-				string += hexString(UInt16(i), padding: 4) + ": "
+                string += hexString(UInt8(i), padding: 4) + ": "
 			}
 			
 			string += hexString(memory[i], padding: 2) + " "

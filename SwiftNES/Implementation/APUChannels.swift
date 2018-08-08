@@ -16,23 +16,23 @@ class APURegister {
 	
 	let dutyTable: [[UInt8]] = [[0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 1, 0, 0, 0, 0, 0], [0, 1, 1, 1, 1, 0, 0, 0], [1, 0, 0, 1, 1, 1, 1, 1]]
 	
-	let noiseTable: [UInt16] = [4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068]
+	let noiseTable: [Int] = [4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068]
 	
 	// Register 4
 	var lengthCounter: UInt8 {
 		didSet {
-			wavelength = (wavelength & 0xFF) | (UInt16(lengthCounter & 0x7) << 8)
+			wavelength = (wavelength & 0xFF) | (Int(lengthCounter & 0x7) << 8)
 			lengthCounterLoad = lengthTable[Int((lengthCounter >> 3) & 0x1F)]
 		}
 	}
 	// 3 bits
-	var wavelength: UInt16
+	var wavelength: Int
 	// 5 bits
 	var lengthCounterLoad: UInt8
 	
 	var lengthCounterDisable: Bool
 	
-	var timer: UInt16
+	var timer: Int
 	
 	init() {
 		lengthCounter = 0
@@ -93,14 +93,14 @@ final class Square: APURegister {
 	// Register 3
 	var wavelengthLow: UInt8 {
 		didSet {
-			wavelength = (wavelength & 0xFF00) | UInt16(wavelengthLow)
+			wavelength = (wavelength & 0xFF00) | Int(wavelengthLow)
 		}
 	}
 	
 	// Register 4
 	override var lengthCounter: UInt8 {
 		didSet {
-			wavelength = (wavelength & 0xFF) | (UInt16(lengthCounter & 0x7) << 8)
+			wavelength = (wavelength & 0xFF) | (Int(lengthCounter & 0x7) << 8)
 			lengthCounterLoad = lengthTable[Int((lengthCounter >> 3) & 0x1F)]
 			dutyIndex = 0
 			envelopeShouldUpdate = true
@@ -111,7 +111,7 @@ final class Square: APURegister {
 	
 	var sweepShouldUpdate: Bool
 	var sweepValue: UInt8
-	var targetWavelength: UInt16
+	var targetWavelength: Int
 	
 	var dutyIndex: Int
 	
@@ -176,7 +176,7 @@ final class Square: APURegister {
 	}
 	
 	private func sweepUpdate() {
-		let delta = wavelength >> UInt16(sweepShift)
+		let delta = wavelength >> Int(sweepShift)
 		
 		if decreaseWavelength {
 			targetWavelength = wavelength - delta
@@ -250,13 +250,13 @@ final class Triangle: APURegister {
 	// Register 3
 	var wavelengthLow: UInt8 {
 		didSet {
-			wavelength = (wavelength & 0xFF00) | UInt16(wavelengthLow)
+			wavelength = (wavelength & 0xFF00) | Int(wavelengthLow)
 		}
 	}
 	
 	override var lengthCounter: UInt8 {
 		didSet {
-			wavelength = (wavelength & 0xFF) | (UInt16(lengthCounter & 0x7) << 8)
+			wavelength = (wavelength & 0xFF) | (Int(lengthCounter & 0x7) << 8)
 			lengthCounterLoad = lengthTable[Int((lengthCounter >> 3) & 0x1F)]
 			timer = wavelength
 			linearReload = true
@@ -361,7 +361,7 @@ final class Noise: APURegister {
 		}
 	}
 	// 4 bits
-	var sampleRate: UInt16
+	var sampleRate: Int
 	// 3 unused bits
 	var randomNumberGeneration: Bool
 	
@@ -373,7 +373,7 @@ final class Noise: APURegister {
 		}
 	}
 	
-	var shiftRegister: UInt16
+	var shiftRegister: Int
 	
 	var envelopeShouldUpdate: Bool
 	var envelopePeriod: UInt8
@@ -402,7 +402,7 @@ final class Noise: APURegister {
 		if timer == 0 {
 			timer = sampleRate
 			
-			let shift: UInt16 = randomNumberGeneration ? 6 : 1
+			let shift: Int = randomNumberGeneration ? 6 : 1
 			
 			let bit0 = shiftRegister & 0x1
 			let bit1 = (shiftRegister >> shift) & 0x1
@@ -446,7 +446,7 @@ final class Noise: APURegister {
 }
 
 final class DMC {
-	let rateTable: [UInt16] = [428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54]
+	let rateTable: [Int] = [428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54]
 	
 	var control: UInt8 {
 		didSet {
@@ -464,7 +464,7 @@ final class DMC {
 	
 	var irqEnabled: Bool
 	var loopEnabled: Bool
-	var rate: UInt16
+	var rate: Int
 	
 	var directLoad: UInt8 {
 		didSet {
@@ -474,21 +474,21 @@ final class DMC {
 	
 	var address: UInt8 {
 		didSet {
-			currentAddress = 0xC000 | (UInt16(address) << 6)
+			currentAddress = 0xC000 | (Int(address) << 6)
 		}
 	}
 	
-	private var currentAddress: UInt16
+	private var currentAddress: Int
 	
 	var sampleLength: UInt8 {
 		didSet {
-//			self.sampleLengthRemaining = (UInt16(sampleLength) << 4) | 1
+//			self.sampleLengthRemaining = (Int(sampleLength) << 4) | 1
 		}
 	}
 	
-	var sampleLengthRemaining: UInt16
+	var sampleLengthRemaining: Int
 	
-	private var timer: UInt16
+	private var timer: Int
 	private var volume: UInt8
 	var dmcIRQ: Bool
 	
@@ -525,8 +525,8 @@ final class DMC {
 	}
 	
 	func restart() {
-		currentAddress = 0xC000 | (UInt16(address) << 6)
-		sampleLengthRemaining = (UInt16(sampleLength) << 4) | 1
+		currentAddress = 0xC000 | (Int(address) << 6)
+		sampleLengthRemaining = (Int(sampleLength) << 4) | 1
 	}
 	
 	func stepTimer() {

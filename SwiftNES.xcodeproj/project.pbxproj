@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04ADFD6A211B7D5600CAB40D /* smb3.nes in Resources */ = {isa = PBXBuildFile; fileRef = 04ADFD69211B7D5600CAB40D /* smb3.nes */; };
 		6613873F1CFCD80700564AE3 /* Mapper2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6613873E1CFCD80700564AE3 /* Mapper2.swift */; };
 		661387411CFCEFE400564AE3 /* Mapper3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661387401CFCEFE400564AE3 /* Mapper3.swift */; };
 		661387431CFCF49800564AE3 /* Mapper7.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661387421CFCF49800564AE3 /* Mapper7.swift */; };
@@ -26,7 +27,6 @@
 		66796ECA1CDCD2F80015E810 /* APU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66796EC91CDCD2F80015E810 /* APU.swift */; };
 		668B05F21CE1515600315BCD /* APUChannels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668B05F11CE1515600315BCD /* APUChannels.swift */; };
 		668B05F41CE28D4500315BCD /* APUBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668B05F31CE28D4500315BCD /* APUBuffer.swift */; };
-		668CB6BA1D71F1A300E74FCF /* smb3.nes in Resources */ = {isa = PBXBuildFile; fileRef = 668CB6B91D71F1A300E74FCF /* smb3.nes */; };
 		668CB6BC1D72104100E74FCF /* MacControllerIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668CB6BB1D72104100E74FCF /* MacControllerIO.swift */; };
 		668CB6C01D73298A00E74FCF /* iOSControllerIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668CB6BF1D73298A00E74FCF /* iOSControllerIO.swift */; };
 		66A9C4371CA2EF3800936DBC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A9C4361CA2EF3800936DBC /* AppDelegate.swift */; };
@@ -73,6 +73,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		04ADFD69211B7D5600CAB40D /* smb3.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = smb3.nes; sourceTree = "<group>"; };
 		6613873E1CFCD80700564AE3 /* Mapper2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Mapper2.swift; path = Implementation/Mappers/Mapper2.swift; sourceTree = "<group>"; };
 		661387401CFCEFE400564AE3 /* Mapper3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Mapper3.swift; path = Implementation/Mappers/Mapper3.swift; sourceTree = "<group>"; };
 		661387421CFCF49800564AE3 /* Mapper7.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Mapper7.swift; path = Implementation/Mappers/Mapper7.swift; sourceTree = "<group>"; };
@@ -92,7 +93,6 @@
 		66796EC91CDCD2F80015E810 /* APU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APU.swift; path = Implementation/APU.swift; sourceTree = "<group>"; };
 		668B05F11CE1515600315BCD /* APUChannels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APUChannels.swift; path = Implementation/APUChannels.swift; sourceTree = "<group>"; };
 		668B05F31CE28D4500315BCD /* APUBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APUBuffer.swift; path = Implementation/APUBuffer.swift; sourceTree = "<group>"; };
-		668CB6B91D71F1A300E74FCF /* smb3.nes */ = {isa = PBXFileReference; lastKnownFileType = file; name = smb3.nes; path = ../../../testROMs/games/smb3.nes; sourceTree = "<group>"; };
 		668CB6BB1D72104100E74FCF /* MacControllerIO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MacControllerIO.swift; path = Implementation/MacControllerIO.swift; sourceTree = "<group>"; };
 		668CB6BF1D73298A00E74FCF /* iOSControllerIO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOSControllerIO.swift; sourceTree = "<group>"; };
 		66A9C4331CA2EF3800936DBC /* SwiftNES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftNES.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -165,6 +165,7 @@
 		66A9C42A1CA2EF3800936DBC = {
 			isa = PBXGroup;
 			children = (
+				04ADFD69211B7D5600CAB40D /* smb3.nes */,
 				664032B41CC0317B00FF7C6B /* Metal.framework */,
 				664032B51CC0317B00FF7C6B /* MetalKit.framework */,
 				66A9C4351CA2EF3800936DBC /* SwiftNES */,
@@ -236,7 +237,6 @@
 				66C0E7FE1D171FE3008F6C3D /* Assets.xcassets */,
 				66C0E8001D171FE3008F6C3D /* LaunchScreen.storyboard */,
 				66C0E8031D171FE3008F6C3D /* Info.plist */,
-				668CB6B91D71F1A300E74FCF /* smb3.nes */,
 			);
 			path = "SwiftNES-iOS";
 			sourceTree = "<group>";
@@ -327,9 +327,10 @@
 					};
 					66C0E7F41D171FE3008F6C3D = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = 58JLRGUCJQ;
+						DevelopmentTeam = L5EP8QQ48K;
 						DevelopmentTeamName = "Adam Gastineau";
-						ProvisioningStyle = Manual;
+						LastSwiftMigration = 0940;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -374,8 +375,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04ADFD6A211B7D5600CAB40D /* smb3.nes in Resources */,
 				66C0E8021D171FE3008F6C3D /* LaunchScreen.storyboard in Resources */,
-				668CB6BA1D71F1A300E74FCF /* smb3.nes in Resources */,
 				66C0E7FF1D171FE3008F6C3D /* Assets.xcassets in Resources */,
 				66C0E7FD1D171FE3008F6C3D /* Main.storyboard in Resources */,
 			);
@@ -644,18 +645,21 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 58JLRGUCJQ;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L5EP8QQ48K;
 				INFOPLIST_FILE = "SwiftNES-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.appcannon.SwiftNES-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightryan.SwiftNES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "58860516-5541-401d-b7b6-352ee966f14b";
-				PROVISIONING_PROFILE_SPECIFIER = "Provisioning Profile";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -666,17 +670,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 58JLRGUCJQ;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L5EP8QQ48K;
 				INFOPLIST_FILE = "SwiftNES-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.appcannon.SwiftNES-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brightryan.SwiftNES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "58860516-5541-401d-b7b6-352ee966f14b";
-				PROVISIONING_PROFILE_SPECIFIER = "Provisioning Profile";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};

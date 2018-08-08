@@ -69,14 +69,14 @@ final class CPU: NSObject {
 	private var pageCrossed = false
 	
 	private var dummyReadRequired = false
-	private var dummyReadAddress: UInt16 = 0
+	private var dummyReadAddress: Int = 0
 	
 	/**
 	 True if CPU is currently running an OAM transfer
 	*/
 	private var oamTransfer = false
 	
-	private var oamDMAAddress: UInt16 = 0
+	private var oamDMAAddress: Int = 0
 	
 	/**
 	 Stores the number of cycles in the current OAM transfer
@@ -198,7 +198,7 @@ final class CPU: NSObject {
         // Set PC to program start address
         setPC(programStartAddress)
         
-        print("PC initialized to \((UInt16(self.PCH) << 8) | UInt16(self.PCL))")
+        print("PC initialized to \((Int(self.PCH) << 8) | Int(self.PCL))")
     }
 	
 	/**
@@ -217,9 +217,9 @@ final class CPU: NSObject {
 				ppuStep()
 			}
 			
-			let startAddress = UInt16(ppu.OAMADDR)
+			let startAddress = Int(ppu.OAMADDR)
 			
-			for i: UInt16 in 0 ..< 256 {
+			for i: Int in 0 ..< 256 {
 				let data = readCycle(oamDMAAddress + i)
 				
 				ppuStep()
@@ -637,7 +637,7 @@ final class CPU: NSObject {
 				 LXA()
 				
 			// NOP
-			case 0xEA, 0x1A, 0x3A, 0x5A, 0x7A, 0xDA, 0xEA, 0xFA:
+			case 0xEA, 0x1A, 0x3A, 0x5A, 0x7A, 0xDA, 0xFA:
 				 NOP()
 				
 			// ORA
@@ -877,13 +877,13 @@ final class CPU: NSObject {
 		return true
 	}
 	
-	func readCycle(_ address: UInt16) -> UInt8 {
+	func readCycle(_ address: Int) -> UInt8 {
 		ppuStep()
 		
 		return mainMemory.readMemory(address)
 	}
 	
-	func writeCycle(_ address: UInt16, data: UInt8) {
+	func writeCycle(_ address: Int, data: UInt8) {
 		ppuStep()
 		
 		mainMemory.writeMemory(address, data: data)
@@ -904,8 +904,8 @@ final class CPU: NSObject {
 		previousBRKSetIRQ = brkSetIRQ
 	}
 	
-    func address(_ lower: UInt8, upper: UInt8) -> UInt16 {
-        return UInt16(lower) | (UInt16(upper) << 8)
+    func address(_ lower: UInt8, upper: UInt8) -> Int {
+        return Int(lower) | (Int(upper) << 8)
     }
     
     func setPBit(_ index: Int, value: Bool) {
@@ -928,11 +928,11 @@ final class CPU: NSObject {
         return readCycle(addressUsingAddressingMode(mode))
     }
     
-    func addressUsingAddressingMode(_ mode: AddressingMode) -> UInt16 {
+    func addressUsingAddressingMode(_ mode: AddressingMode) -> Int {
         switch mode {
 			case AddressingMode.zeroPage:
 				ppuStep()
-				return UInt16(fetchPC())
+				return Int(fetchPC())
 			case AddressingMode.zeroPageIndexedX, .zeroPageIndexedY:
 				var index = X
 				
@@ -945,7 +945,7 @@ final class CPU: NSObject {
 				
 				ppuStep()
 				
-				return UInt16(pc &+ index)
+				return Int(pc &+ index)
 			case AddressingMode.absolute:
 				ppuStep()
 				let lowByte = fetchPC()
@@ -966,11 +966,11 @@ final class CPU: NSObject {
 					index = Y
 				}
 
-				let index16 = UInt16(index)
+				let index16 = Int(index)
 				
 				let originalAddress = address(lowByte, upper: highByte)
 				
-				if UInt16(lowByte) + index16 > 0xFF {
+				if Int(lowByte) + index16 > 0xFF {
 					dummyReadRequired = true
 				}
 				
@@ -978,7 +978,7 @@ final class CPU: NSObject {
 				
 				let newAddress = (originalAddress &+ index16)
 				
-				pageCrossed = !checkPage(UInt16(newAddress), originalAddress: UInt16(originalAddress))
+				pageCrossed = !checkPage(Int(newAddress), originalAddress: Int(originalAddress))
 				
 				return newAddress
 			case AddressingMode.indirectX:
@@ -987,25 +987,25 @@ final class CPU: NSObject {
 				
 				ppuStep()
 				
-				let lowByte = readCycle(UInt16(immediate &+ X))
+				let lowByte = readCycle(Int(immediate &+ X))
 				
-				let highByte = readCycle(UInt16(immediate &+ X &+ 1))
+				let highByte = readCycle(Int(immediate &+ X &+ 1))
 				
 				return address(lowByte, upper: highByte)
 			case AddressingMode.indirectY:
 				ppuStep()
-				let immediate = UInt16(fetchPC())
+				let immediate = Int(fetchPC())
 				
 				let lowByte = readCycle(immediate)
 				let highByte = readCycle((immediate + 1) & 0xFF)
 				
 				let originalAddress = address(lowByte, upper: highByte)
 				
-				if(UInt16(lowByte) + UInt16(Y) > 0xFF) {
+				if(Int(lowByte) + Int(Y) > 0xFF) {
 					dummyReadRequired = true
 				}
 				
-				let y16 = UInt16(Y)
+				let y16 = Int(Y)
 				
 				dummyReadAddress = ((originalAddress & 0xFF00) | (originalAddress + y16) & 0xFF)
 				
@@ -1023,14 +1023,14 @@ final class CPU: NSObject {
 	/**
 	 Returns true if the address lies on the same page as PC
 	*/
-	func checkPage(_ address: UInt16) -> Bool {
+	func checkPage(_ address: Int) -> Bool {
 		return checkPage(address, originalAddress: getPC())
 	}
 	
 	/**
 	 Returns true if the address lies on the same page as originalAddress
 	*/
-	func checkPage(_ address: UInt16, originalAddress: UInt16) -> Bool {
+	func checkPage(_ address: Int, originalAddress: Int) -> Bool {
 		return address / 0x100 == originalAddress / 0x100
 	}
 	
@@ -1104,8 +1104,8 @@ final class CPU: NSObject {
 		// Set interrupt flag
 		setPBit(2, value: true)
 		
-		var PCLAddr: UInt16 = 0
-		var PCHAddr: UInt16 = 0
+		var PCLAddr: Int = 0
+		var PCHAddr: Int = 0
 		
 		if previousNMITriggered {
 			PCLAddr = 0xFFFA
@@ -1136,7 +1136,7 @@ final class CPU: NSObject {
 
 		oamExtraCycle = !evenCycle
 
-		oamDMAAddress = (UInt16(ppu.OAMDMA) << 8) & 0xFF00
+		oamDMAAddress = (Int(ppu.OAMDMA) << 8) & 0xFF00
 	}
 	
 	func startDMCTransfer() {
@@ -1144,13 +1144,13 @@ final class CPU: NSObject {
 	}
 	
     // MARK: - PC Operations
-    func setPC(_ address: UInt16) {
+    func setPC(_ address: Int) {
         PCL = UInt8(address & 0xFF)
         PCH = UInt8((address & 0xFF00) >> 8)
     }
     
-    func getPC() -> UInt16 {
-        return UInt16(PCL) | (UInt16(PCH) << 8)
+    func getPC() -> Int {
+        return Int(PCL) | (Int(PCH) << 8)
     }
     
     func incrementPC() {
@@ -1171,7 +1171,7 @@ final class CPU: NSObject {
     
     // MARK: - Stack Operations
     func push(_ byte: UInt8) {
-        writeCycle(0x100 + UInt16(SP), data: byte)
+        writeCycle(0x100 + Int(SP), data: byte)
         
         SP = SP &- 1
     }
@@ -1179,7 +1179,7 @@ final class CPU: NSObject {
     func pop() -> UInt8 {
 		SP = SP &+ 1
 		
-        return readCycle(0x100 + UInt16(SP))
+        return readCycle(0x100 + Int(SP))
     }
     
     // MARK: - Instructions
@@ -1577,10 +1577,10 @@ final class CPU: NSObject {
                 PCL = lowByte
             case AddressingMode.absoluteIndirect:
 				ppuStep()
-				let lowerByte = UInt16(fetchPC())
+				let lowerByte = Int(fetchPC())
 				
 				ppuStep()
-				let higherByte = UInt16(fetchPC()) << 8
+				let higherByte = Int(fetchPC()) << 8
 				
                 PCL = readCycle(lowerByte | higherByte)
 				// Add 1 only to lower byte due to CPU bug
@@ -1598,7 +1598,7 @@ final class CPU: NSObject {
     func ADC(_ mode: AddressingMode) {
 		let memoryValue = readFromMemoryUsingAddressingMode(mode)
 		
-		let temp = UInt16(A) + UInt16(memoryValue) + (getPBit(0) ? 1 : 0)
+		let temp = Int(A) + Int(memoryValue) + (getPBit(0) ? 1 : 0)
 		
 		// Set overflow flag
 		setPBit(6, value: (~(A ^ memoryValue) & (A ^ UInt8(temp & 0xFF)) & 0x80) == 0x80)
@@ -1612,7 +1612,7 @@ final class CPU: NSObject {
 		// Decimal mode not supported by NES CPU
 		// Decimal flag
 		/*if(getPBit(3)) {
-			temp = UInt16(bcdValue(self.A)) + UInt16(bcdValue(memoryValue)) + (getPBit(0) ? 1 : 0)
+			temp = Int(bcdValue(self.A)) + Int(bcdValue(memoryValue)) + (getPBit(0) ? 1 : 0)
 			
 			// Set carry flag
 			setPBit(0, value: temp > 99)
@@ -2160,7 +2160,7 @@ final class CPU: NSObject {
         value = (value >> 1) & 0x7F
         value = value | (getPBit(0) ? 0x80 : 0)
         
-        let temp = UInt16(A) + UInt16(value) + UInt16(carry)
+        let temp = Int(A) + Int(value) + Int(carry)
         
         // Set overflow flag
         setPBit(6, value: (~(A ^ value) & (A ^ UInt8(temp & 0xFF)) & 0x80) == 0x80)
@@ -2348,7 +2348,7 @@ final class CPU: NSObject {
 		
 		ppuStep()
 		
-		writeCycle((UInt16(high) << 8) | (address & 0xFF), data: X)
+		writeCycle((Int(high) << 8) | (address & 0xFF), data: X)
 	}
 	
 	/**
@@ -2361,7 +2361,7 @@ final class CPU: NSObject {
 		
 		ppuStep()
 		
-		writeCycle((UInt16(high) << 8) | (address & 0xFF), data: Y)
+		writeCycle((Int(high) << 8) | (address & 0xFF), data: Y)
 	}
 	
     // MARK: Flow Control
@@ -2409,7 +2409,7 @@ final class CPU: NSObject {
 	*/
 	func BCC() {
 		ppuStep()
-        let relative = UInt16(fetchPC())
+        let relative = Int(fetchPC())
 		
 		if !getPBit(0) {
 			ppuStep()
@@ -2428,7 +2428,7 @@ final class CPU: NSObject {
 	*/
 	func BCS() {
 		ppuStep()
-		let relative = UInt16(fetchPC())
+		let relative = Int(fetchPC())
 		
 		if getPBit(0) {
 			ppuStep()
@@ -2447,7 +2447,7 @@ final class CPU: NSObject {
 	*/
 	func BEQ() {
 		ppuStep()
-		let relative = UInt16(fetchPC())
+		let relative = Int(fetchPC())
 		
 		if getPBit(1) {
 			ppuStep()
@@ -2466,7 +2466,7 @@ final class CPU: NSObject {
 	*/
 	func BMI() {
 		ppuStep()
-		let relative = UInt16(fetchPC())
+		let relative = Int(fetchPC())
 		
 		if getPBit(7) {
 			ppuStep()
@@ -2485,7 +2485,7 @@ final class CPU: NSObject {
 	*/
 	func BNE() {
 		ppuStep()
-		let relative = UInt16(fetchPC())
+		let relative = Int(fetchPC())
 		
 		if(!getPBit(1)) {
 			ppuStep()
@@ -2504,7 +2504,7 @@ final class CPU: NSObject {
 	*/
 	func BPL() {
 		ppuStep()
-		let relative = UInt16(fetchPC())
+		let relative = Int(fetchPC())
 		
 		if(!getPBit(7)) {
 			ppuStep()
@@ -2523,7 +2523,7 @@ final class CPU: NSObject {
 	*/
 	func BVC() {
 		ppuStep()
-		let relative = UInt16(fetchPC())
+		let relative = Int(fetchPC())
 		
 		if(!getPBit(6)) {
 			ppuStep()
@@ -2542,7 +2542,7 @@ final class CPU: NSObject {
 	*/
 	func BVS() {
 		ppuStep()
-		let relative = UInt16(fetchPC())
+		let relative = Int(fetchPC())
 		
 		if(getPBit(6)) {
 			ppuStep()
